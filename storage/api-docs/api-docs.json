@@ -1,0 +1,161 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Fruits API",
+        "description": "API documentation for the Fruits system",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://127.0.0.1:8000",
+            "description": "Main API server"
+        }
+    ],
+    "paths": {
+        "/cards": {},
+        "/api/admin/cards": {
+            "get": {
+                "tags": [
+                    "Card"
+                ],
+                "summary": "Lấy danh sách card",
+                "operationId": "6b183c199a0477b18ceae55b1788a12f",
+                "responses": {
+                    "200": {
+                        "description": "Danh sách card",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Card"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Card"
+                ],
+                "summary": "Tạo mới card",
+                "operationId": "b6049411123456119d22285a9be9859a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CardStoreRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Card được tạo thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Card"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "CardStoreRequest": {
+                "required": [
+                    "name",
+                    "stars",
+                    "rarity"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Dragon Fruit"
+                    },
+                    "stars": {
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "A rare and exotic fruit card."
+                    },
+                    "rarity": {
+                        "type": "string",
+                        "example": "Legendary"
+                    },
+                    "image_url": {
+                        "description": "Upload image file",
+                        "type": "string",
+                        "format": "binary"
+                    }
+                },
+                "type": "object",
+                "format": "multipart"
+            },
+            "Card": {
+                "title": "Card",
+                "required": [
+                    "id",
+                    "name",
+                    "stars",
+                    "description",
+                    "rarity",
+                    "image_url"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Dragon Fruit"
+                    },
+                    "stars": {
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "A rare and exotic fruit card."
+                    },
+                    "rarity": {
+                        "type": "string",
+                        "example": "Legendary"
+                    },
+                    "image_url": {
+                        "type": "string",
+                        "format": "url",
+                        "example": "https://example.com/images/dragon_fruit.png"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Nhập token JWT vào ô Authorization",
+                "name": "Authorization",
+                "in": "header",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Card",
+            "description": "Quản lý card"
+        }
+    ]
+}
