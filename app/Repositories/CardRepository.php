@@ -64,7 +64,18 @@ class CardRepository
             return $this->card->inRandomOrder()->first();
         }
 
-        // Random 1 card trong nhóm rarity đã chọn
-        return $cards->random();
+        // Lặp random cho đến khi chọn được card mà chỉ có 1 card cùng name trong nhóm
+        $attempt = 0;
+        do {
+            $randomCard = $cards->random();
+            $sameNameCards = $cards->where('name', $randomCard->name);
+            $attempt++;
+            // Nếu chỉ có 1 card cùng name hoặc đã thử quá 10 lần thì trả về card này
+            if ($sameNameCards->count() === 1 || $attempt > 10) {
+                return $randomCard;
+            }
+            // Nếu còn nhiều card cùng name, random tiếp trong nhóm đó
+            $cards = $sameNameCards;
+        } while (true);
     }
 }
