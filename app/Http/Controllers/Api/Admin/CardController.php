@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Card\CardStoreRequest;
+use App\Http\Resources\CardResource;
 use App\Repositories\CardRepository;
 use Illuminate\Http\Request;
 
@@ -35,7 +36,39 @@ class CardController extends Controller
      */
     public function index()
     {
-        return $this->cardRepository->getAllCards();
+        return CardResource::collection($this->cardRepository->getAllCards());
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/admin/cards/{id}",
+     *     tags={"Card"},
+     *     summary="Lấy thông tin chi tiết của một card",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID của card",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Thông tin chi tiết của card",
+     *         @OA\JsonContent(ref="#/components/schemas/Card")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Card không tìm thấy"
+     *     )
+     * )
+     */
+    public function show($id)
+    {
+        $card = $this->cardRepository->getCardById($id);
+        if (!$card) {
+            return response()->json(['message' => 'Card not found'], 404);
+        }
+        return new CardResource($card);
     }
     /**
      * @OA\Post(
@@ -58,6 +91,7 @@ class CardController extends Controller
      */
     public function store(CardStoreRequest $request)
     {
-        return $this->cardRepository->createCard($request->validated());
+        $card = $this->cardRepository->createCard($request->validated());
+        return (new CardResource($card))->response()->setStatusCode(201);
     }
 }

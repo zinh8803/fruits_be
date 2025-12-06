@@ -12,7 +12,148 @@
         }
     ],
     "paths": {
+        "/auth": {},
         "/cards": {},
+        "/api/auth/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Đăng ký người dùng mới",
+                "operationId": "ee65fb3f9c9eb5626a80236e13c1683d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Nguyen Van A"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "nguyenvana@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Đăng ký thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "user": {
+                                            "type": "object"
+                                        },
+                                        "token": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Yêu cầu không hợp lệ"
+                    }
+                }
+            }
+        },
+        "/api/auth/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Đăng nhập người dùng",
+                "operationId": "ab30188b420cffef6b7117d6e4decb92",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "nguyenvana@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Đăng nhập thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Đăng nhập thành công"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Email hoặc mật khẩu không đúng",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Email hoặc mật khẩu không đúng"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/admin/cards": {
             "get": {
                 "tags": [
@@ -62,6 +203,66 @@
                                 }
                             }
                         }
+                    }
+                }
+            }
+        },
+        "/api/admin/cards/{id}": {
+            "get": {
+                "tags": [
+                    "Card"
+                ],
+                "summary": "Lấy thông tin chi tiết của một card",
+                "operationId": "8b492d0de04c5abf87f6b7d66fc17f52",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID của card",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Thông tin chi tiết của card",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Card"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Card không tìm thấy"
+                    }
+                }
+            }
+        },
+        "/api/user/cards/random": {
+            "get": {
+                "tags": [
+                    "Card - User"
+                ],
+                "summary": "Lấy ngẫu nhiên một card dựa trên tỷ lệ rarity",
+                "operationId": "a7cd3341ba36d05414bb06134525423e",
+                "responses": {
+                    "200": {
+                        "description": "Card ngẫu nhiên",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Card"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Không có card nào phù hợp"
                     }
                 }
             }
@@ -154,8 +355,16 @@
     },
     "tags": [
         {
+            "name": "Auth",
+            "description": "Quản lý xác thực người dùng"
+        },
+        {
             "name": "Card",
             "description": "Quản lý card"
+        },
+        {
+            "name": "Card - User",
+            "description": "Quản lý card người dùng"
         }
     ]
 }

@@ -6,6 +6,17 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthRepository
 {
+    protected $user;
+    public function __construct(User $user)
+    {
+        $this->user = $user;
+    }
+    public function registerUser($data)
+    {
+        $data['password'] = Hash::make($data['password']);
+        return $this->user->create($data);
+    }
+    
     public function attemptLogin($email, $password)
     {
         if (!Auth::attempt(['email' => $email, 'password' => $password])) {

@@ -34,7 +34,9 @@ class CardResource extends JsonResource
             'stars' => $this->stars,
             'description' => $this->description,
             'rarity' => $this->rarity,
-            'image_url' => 'http://127.0.0.1:8000/storage/'.$this->image_url,
+            'image_url' => $this->image_url
+                ? url('storage/' . $this->image_url)
+                : null,
         ];
     }
 }
