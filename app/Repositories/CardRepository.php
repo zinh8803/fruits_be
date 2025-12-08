@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Card;
+use Illuminate\Support\Facades\Cache;
 
 class CardRepository
 {
@@ -56,12 +57,33 @@ class CardRepository
         // Random rarity theo tỷ lệ
         $selectedRarity = $pool[array_rand($pool)];
 
-        // Lấy các card thuộc rarity đã chọn
-        $cards = $this->card->where('rarity', $selectedRarity)->get();
+        // Sử dụng cache cho danh sách card theo rarity
+        $cacheKey = "cards_rarity_" . $selectedRarity;
+        $cardsArr = Cache::get($cacheKey);
+
+        if ($cardsArr) {
+            info("Lấy cards từ Redis cache: " . $cacheKey);
+            $cards = collect($cardsArr)->map(function ($item) {
+                return new Card($item);
+            });
+        } else {
+            info("Lấy cards từ database và lưu vào Redis cache: " . $cacheKey);
+            $cards = $this->card->where('rarity', $selectedRarity)->get();
+            Cache::put($cacheKey, $cards->toArray(), 60); // TTL 60 giây
+        }
 
         if ($cards->isEmpty()) {
-            // Nếu không có card thuộc rarity này, fallback random bất kỳ
-            return $this->card->inRandomOrder()->first();
+            $allCacheKey = 'cards_all_random';
+            $randomCardArr = Cache::get($allCacheKey);
+            if ($randomCardArr) {
+                info("Lấy card random từ Redis cache: " . $allCacheKey);
+                return new Card($randomCardArr);
+            } else {
+                info("Lấy card random từ database và lưu vào Redis cache: " . $allCacheKey);
+                $randomCard = $this->card->inRandomOrder()->first();
+                Cache::put($allCacheKey, $randomCard->toArray(), 60);
+                return $randomCard;
+            }
         }
 
         // Lặp random cho đến khi chọn được card mà chỉ có 1 card cùng name trong nhóm
