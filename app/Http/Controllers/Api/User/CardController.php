@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api\User;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CardResource;
+use App\Http\Resources\UserCardResource;
 use App\Repositories\CardRepository;
 use Illuminate\Http\Request;
+
 /**
  * @OA\Tag(
  *     name="Card - User",
@@ -52,5 +54,31 @@ class CardController extends Controller
                 'message' => 'Không có card nào phù hợp'
             ], 404);
         }
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/user/cards",
+     *     tags={"Card - User"},
+     *     summary="Lấy danh sách card của người dùng",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Danh sách card của người dùng",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/Card")
+     *         )
+     *     )
+     * )
+     */
+    public function userCards(Request $request)
+    {
+        $user_id = $request->user()->id;
+        $userCards = $this->cardRepository->userCards($user_id);
+        return response()->json([
+            'status' => true,
+            'message' => 'Lấy danh sách card của người dùng thành công',
+            'data' => UserCardResource::collection($userCards)
+        ], 200);
     }
 }

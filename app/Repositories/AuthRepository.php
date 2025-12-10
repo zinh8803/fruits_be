@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Repositories;
+
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +18,7 @@ class AuthRepository
         $data['password'] = Hash::make($data['password']);
         return $this->user->create($data);
     }
-    
+
     public function attemptLogin($email, $password)
     {
         if (!Auth::attempt(['email' => $email, 'password' => $password])) {
@@ -25,9 +27,12 @@ class AuthRepository
         return Auth::user();
     }
 
-    public function logout($user)
+    public function logout()
     {
-        Auth::logout();
-        return true;
+        return Auth::logout();
+    }
+    public function me()
+    {
+        return Auth::user();
     }
 }

@@ -154,6 +154,42 @@
                 }
             }
         },
+        "/api/auth/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Đăng xuất người dùng",
+                "operationId": "1b9d815a90eaf5d9476864adffeb387a",
+                "responses": {
+                    "200": {
+                        "description": "Đăng xuất thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Đăng xuất thành công"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/admin/cards": {
             "get": {
                 "tags": [
@@ -243,6 +279,32 @@
                 }
             }
         },
+        "/api/auth/me": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Lấy thông tin người dùng hiện tại",
+                "operationId": "82b49a06ce04dff319bf4f8bc3ab561a",
+                "responses": {
+                    "200": {
+                        "description": "Thông tin người dùng",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/user/cards/random": {
             "get": {
                 "tags": [
@@ -263,6 +325,30 @@
                     },
                     "404": {
                         "description": "Không có card nào phù hợp"
+                    }
+                }
+            }
+        },
+        "/api/user/cards": {
+            "get": {
+                "tags": [
+                    "Card - User"
+                ],
+                "summary": "Lấy danh sách card của người dùng",
+                "operationId": "8f4bb1a4f5d087f0ae7011c3af773e79",
+                "responses": {
+                    "200": {
+                        "description": "Danh sách card của người dùng",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Card"
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -337,6 +423,46 @@
                         "type": "string",
                         "format": "url",
                         "example": "https://example.com/images/dragon_fruit.png"
+                    }
+                },
+                "type": "object"
+            },
+            "User": {
+                "title": "User",
+                "required": [
+                    "id",
+                    "name",
+                    "email",
+                    "role"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "ID của người dùng",
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "name": {
+                        "description": "Tên của người dùng",
+                        "type": "string",
+                        "example": "Nguyen Van A"
+                    },
+                    "email": {
+                        "description": "Email của người dùng",
+                        "type": "string",
+                        "format": "email",
+                        "example": "nguyenvana@example.com"
+                    },
+                    "image_url": {
+                        "description": "URL ảnh đại diện của người dùng",
+                        "type": "string",
+                        "format": "url",
+                        "example": "https://example.com/images/nguyenvana.jpg"
+                    },
+                    "role": {
+                        "description": "Vai trò của người dùng",
+                        "type": "string",
+                        "example": "user"
                     }
                 },
                 "type": "object"

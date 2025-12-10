@@ -13,12 +13,22 @@ Route::prefix('admin')->group(function () {
     Route::post('/cards', [App\Http\Controllers\Api\Admin\CardController::class, 'store']);
 });
 
-Route::prefix('user')->group(function () {
-    Route::get('/cards/random', [App\Http\Controllers\Api\User\CardController::class, 'randomCard']);
-});
+
 
 Route::prefix('auth')->group(function () {
     Route::post('/register', [App\Http\Controllers\Api\Admin\AuthController::class, 'register']);
     Route::post('/login', [App\Http\Controllers\Api\Admin\AuthController::class, 'login']);
-    Route::post('/logout', [App\Http\Controllers\Api\Admin\AuthController::class, 'logout'])->middleware('auth:api');
+    //Route::post('/logout', [App\Http\Controllers\Api\Admin\AuthController::class, 'logout'])->middleware('auth:api');
+});
+
+
+Route::middleware('check.role:user')->group(function () {
+    Route::prefix('user')->group(function () {
+        Route::get('/cards/random', [App\Http\Controllers\Api\User\CardController::class, 'randomCard']);
+        Route::get('/cards', [App\Http\Controllers\Api\User\CardController::class, 'userCards']);
+    });
+    Route::prefix('auth')->group(function () {
+        Route::get('/me', [App\Http\Controllers\Api\User\AuthController::class, 'me']);
+        Route::post('/logout', [App\Http\Controllers\Api\Admin\AuthController::class, 'logout']);
+    });
 });

@@ -111,10 +111,36 @@ class AuthController extends Controller
             ], 401);
         }
         //  $user = Auth::guard('api')->user();
-        $accessCookie = cookie('access_token', $token, 60);
+        $accessCookie = cookie('access_token', $token, 60, '/', 'localhost', false, true, true, 'Lax');
         return response()->json([
             'status' => true,
             'message' => 'Đăng nhập thành công'
+        ], 200)->cookie($accessCookie);
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/auth/logout",
+     *     tags={"Auth"},
+     *     summary="Đăng xuất người dùng",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Đăng xuất thành công",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Đăng xuất thành công")
+     *         )
+     *     )
+     * )
+     */
+    public function logout()
+    {
+        $this->authRepository->logout();
+        $accessCookie = cookie('access_token', '', -1, '/', 'localhost', false, true, true, 'Lax');
+        return response()->json([
+            'status' => true,
+            'message' => 'Đăng xuất thành công'
         ], 200)->cookie($accessCookie);
     }
 }

@@ -3,15 +3,20 @@
 namespace App\Repositories;
 
 use App\Models\Card;
-use Illuminate\Support\Facades\Cache;
+use App\Models\UserCard;
+use Illuminate\Support\Facades\Auth;
 
 class CardRepository
 {
     protected $card;
-    public function __construct(Card $card)
+    protected $userCard;
+
+    public function __construct(Card $card, UserCard $userCard)
     {
         $this->card = $card;
+        $this->userCard = $userCard;
     }
+
     public function getAllCards()
     {
         return $this->card->all();
@@ -36,8 +41,44 @@ class CardRepository
         return $card;
     }
 
+
+    public function updateCard($id, $data)
+    {
+        $card = $this->getCardById($id);
+        if (!$card) {
+            return null;
+        }
+
+        $imageFile = request()->file('image_url');
+        unset($data['image_url']);
+        $card->update($data);
+
+        if ($imageFile) {
+            $card->image_url = $imageFile->store('fruits', 'public');
+            $card->save();
+        }
+
+        return $card;
+    }
+
+    public function deleteCard($id)
+    {
+        $card = $this->getCardById($id);
+        if (!$card) {
+            return false;
+        }
+
+        return $card->delete();
+    }
+
+    public function userCards($user_id)
+    {
+        return $this->userCard->where('user_id', $user_id)->with('card')->get();
+    }
+
     public function randomCard()
     {
+        $user_id = Auth::id();
         // Định nghĩa tỷ lệ rarity (có thể điều chỉnh theo nhu cầu)
         $rarityRates = [
             'common' => 60,
@@ -57,33 +98,12 @@ class CardRepository
         // Random rarity theo tỷ lệ
         $selectedRarity = $pool[array_rand($pool)];
 
-        // Sử dụng cache cho danh sách card theo rarity
-        $cacheKey = "cards_rarity_" . $selectedRarity;
-        $cardsArr = Cache::get($cacheKey);
-
-        if ($cardsArr) {
-            info("Lấy cards từ Redis cache: " . $cacheKey);
-            $cards = collect($cardsArr)->map(function ($item) {
-                return new Card($item);
-            });
-        } else {
-            info("Lấy cards từ database và lưu vào Redis cache: " . $cacheKey);
-            $cards = $this->card->where('rarity', $selectedRarity)->get();
-            Cache::put($cacheKey, $cards->toArray(), 60); // TTL 60 giây
-        }
+        // Lấy các card thuộc rarity đã chọn
+        $cards = $this->card->where('rarity', $selectedRarity)->get();
 
         if ($cards->isEmpty()) {
-            $allCacheKey = 'cards_all_random';
-            $randomCardArr = Cache::get($allCacheKey);
-            if ($randomCardArr) {
-                info("Lấy card random từ Redis cache: " . $allCacheKey);
-                return new Card($randomCardArr);
-            } else {
-                info("Lấy card random từ database và lưu vào Redis cache: " . $allCacheKey);
-                $randomCard = $this->card->inRandomOrder()->first();
-                Cache::put($allCacheKey, $randomCard->toArray(), 60);
-                return $randomCard;
-            }
+            // Nếu không có card thuộc rarity này, fallback random bất kỳ
+            return $this->card->inRandomOrder()->first();
         }
 
         // Lặp random cho đến khi chọn được card mà chỉ có 1 card cùng name trong nhóm
@@ -92,8 +112,27 @@ class CardRepository
             $randomCard = $cards->random();
             $sameNameCards = $cards->where('name', $randomCard->name);
             $attempt++;
-            // Nếu chỉ có 1 card cùng name hoặc đã thử quá 10 lần thì trả về card này
+            // Nếu chỉ có 1 card cùng name hoặc đã thử quá 10 lần thì chọn card này
             if ($sameNameCards->count() === 1 || $attempt > 10) {
+                // Sau khi random xong thì +1 số lượng card cho user
+                if ($user_id) {
+                    $userCard = $this->userCard
+                        ->where('user_id', $user_id)
+                        ->where('card_id', $randomCard->id)
+                        ->first();
+
+                    if ($userCard) {
+                        $userCard->quantity += 1;
+                        $userCard->save();
+                    } else {
+                        $this->userCard->create([
+                            'user_id'  => $user_id,
+                            'card_id'  => $randomCard->id,
+                            'quantity' => 1,
+                        ]);
+                    }
+                }
+
                 return $randomCard;
             }
             // Nếu còn nhiều card cùng name, random tiếp trong nhóm đó
