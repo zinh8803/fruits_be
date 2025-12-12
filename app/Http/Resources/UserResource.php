@@ -33,6 +33,7 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'image_url' => $this->image_url ? url('storage/' . $this->image_url) : null,
             'role' => $this->role,
+            'random_time' => $this->random_time,
         ];
     }
 }

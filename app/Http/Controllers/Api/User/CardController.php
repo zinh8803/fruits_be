@@ -41,19 +41,21 @@ class CardController extends Controller
      */
     public function randomCard()
     {
-        $card = $this->cardRepository->randomCard();
-        if ($card) {
-            return response()->json([
-                'status' => true,
-                'message' => 'Lấy card ngẫu nhiên thành công',
-                'data' => new CardResource($card)
-            ], 200);
-        } else {
+        try {
+            $card = $this->cardRepository->randomCard();
+        } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Không có card nào phù hợp'
-            ], 404);
+                'message' => $e->getMessage(),
+                'data' => null,
+            ], 429);
         }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Lấy card ngẫu nhiên thành công',
+            'data' => new CardResource($card),
+        ], 200);
     }
 
     /**

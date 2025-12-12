@@ -277,6 +277,90 @@
                         "description": "Card không tìm thấy"
                     }
                 }
+            },
+            "post": {
+                "tags": [
+                    "Card"
+                ],
+                "summary": "Cập nhật thông tin card",
+                "operationId": "ad623be2cb056721844202f40f5fef75",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID của card",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CardUpdateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Card được cập nhật thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Card"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Card không tìm thấy"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Card"
+                ],
+                "summary": "Xóa một card",
+                "operationId": "1be8a6e1c9aa99c9ae5dc019e2e376a3",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID của card",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Card được xóa thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Card deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Card không tìm thấy"
+                    }
+                }
             }
         },
         "/api/auth/me": {
@@ -362,6 +446,33 @@
                     "stars",
                     "rarity"
                 ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Dragon Fruit"
+                    },
+                    "stars": {
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "A rare and exotic fruit card."
+                    },
+                    "rarity": {
+                        "type": "string",
+                        "example": "Legendary"
+                    },
+                    "image_url": {
+                        "description": "Upload image file",
+                        "type": "string",
+                        "format": "binary"
+                    }
+                },
+                "type": "object",
+                "format": "multipart"
+            },
+            "CardUpdateRequest": {
                 "properties": {
                     "name": {
                         "type": "string",

@@ -11,6 +11,7 @@ Route::prefix('admin')->group(function () {
     Route::get('/cards', [App\Http\Controllers\Api\Admin\CardController::class, 'index']);
     Route::get('/cards/{id}', [App\Http\Controllers\Api\Admin\CardController::class, 'show']);
     Route::post('/cards', [App\Http\Controllers\Api\Admin\CardController::class, 'store']);
+    Route::post('/cards/{id}', [App\Http\Controllers\Api\Admin\CardController::class, 'update']);
 });
 
 

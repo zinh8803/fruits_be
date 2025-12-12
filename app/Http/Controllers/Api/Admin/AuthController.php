@@ -7,6 +7,7 @@ use App\Http\Requests\Auth\StoreAuthRequest;
 use App\Repositories\AuthRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 /**
@@ -104,6 +105,8 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
+        Log::info('email: ' . $credentials['email'] . ', password: ' . $credentials['password']);
+        Log::info('Login attempt with credentials: ' . json_encode($credentials));
         if (!$token = Auth::guard('api')->attempt($credentials)) {
             return response()->json([
                 'status' => false,
@@ -111,7 +114,8 @@ class AuthController extends Controller
             ], 401);
         }
         //  $user = Auth::guard('api')->user();
-        $accessCookie = cookie('access_token', $token, 60, '/', 'localhost', false, true, true, 'Lax');
+        $accessCookie = cookie('access_token', $token, 60);
+        Log::info('Generated token: ' . $token);
         return response()->json([
             'status' => true,
             'message' => 'Đăng nhập thành công'
@@ -137,7 +141,8 @@ class AuthController extends Controller
     public function logout()
     {
         $this->authRepository->logout();
-        $accessCookie = cookie('access_token', '', -1, '/', 'localhost', false, true, true, 'Lax');
+        // $accessCookie = cookie('access_token', '', -1, '/', 'localhost', false, true, true, 'Lax');
+        $accessCookie = cookie('access_token', '', -1);
         return response()->json([
             'status' => true,
             'message' => 'Đăng xuất thành công'
