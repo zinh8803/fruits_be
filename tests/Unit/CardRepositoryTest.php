@@ -6,6 +6,7 @@ use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Card;
 use App\Models\UserCard;
+use App\Models\User;
 use App\Repositories\CardRepository;
 
 class CardRepositoryTest extends TestCase
@@ -17,7 +18,7 @@ class CardRepositoryTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->cardRepository = new CardRepository(new Card(), new UserCard());
+        $this->cardRepository = new CardRepository(new Card(), new UserCard(), new User());
     }
 
     public function test_create_card()

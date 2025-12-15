@@ -32,6 +32,19 @@ class CardRepository
     {
         return $this->card->find($id);
     }
+    public function createCard($data)
+    {
+        $imageFile = request()->file('image_url');
+        unset($data['image_url']);
+        $card = $this->card->create($data);
+
+        if ($card && $imageFile) {
+            $card->image_url = $imageFile->store('fruits', 'public');
+            $card->save();
+        }
+
+        return $card;
+    }
     public function updateCard($id, $data)
     {
         $card = $this->getCardById($id);
@@ -137,7 +150,7 @@ class CardRepository
                 /** @var \App\Models\User $user */
                 $user = Auth::user();
                 if ($user) {
-                    $user->random_time = now()->toTimeString();
+                    $user->random_time = now()->toDateTimeString();
                     $user->save();
                 }
             }
