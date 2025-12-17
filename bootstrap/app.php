@@ -15,6 +15,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'check.role' => \App\Http\Middleware\CheckRole::class,
         ]);
+        $middleware->appendToGroup('api', [
+            \App\Http\Middleware\TransformApiRequest::class,
+            \App\Http\Middleware\TransformApiResponse::class,
+        ]);
+        // $middleware->statefulApi();
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
